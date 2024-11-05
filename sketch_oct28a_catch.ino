@@ -55,7 +55,7 @@ int relay = 10;
 
 
 void setup() {
-  Serial.begin(115200,SERIAL_);
+  Serial.begin(115200);
   pinMode(MOT1, OUTPUT);
   pinMode(DIR1, OUTPUT);
   pinMode(MOT2, OUTPUT);
