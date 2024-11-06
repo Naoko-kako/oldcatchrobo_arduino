@@ -5,9 +5,9 @@
 void send_serial(int left,int right){
   Serial.print(left);
   Serial.print(","); 
- Serial.print(right); 
- Serial.println();
- delay(200);}
+  Serial.print(right); 
+  Serial.println();
+  delay(200);}
 
 
 
@@ -16,31 +16,65 @@ void send_serial(int left,int right){
 int msg[5] = {0};
 
 
+
 void receive_serial() {
   if (Serial.available() > 0) {
 
-    String receivedData = Serial.readStringUntil('\n');  // 改行までのデータを読み込む // データのパース（カンマで分割された2つの値を取得）
-    
-    String msf[5];
-    int commaIndex = receivedData.indexOf(',');
+    String received_data = Serial.readStringUntil('\n'); 
+      
+    String msgstr[5];   // 改行までのデータを読み込む
+    Serial.println(received_data);                          // データをシリアルモニターに表示
 
-    if (commaIndex != -1) {
-      msf[0] = receivedData.substring(0, commaIndex);
-      msf[1] = receivedData.substring(commaIndex + 1);
-      msf[2] = receivedData.substring(commaIndex + 2);
-      msf[3] = receivedData.substring(commaIndex + 3);
-      msf[4] = receivedData.substring(commaIndex + 4);
+    int comma_index1 = received_data.indexOf(',');                                        // 1番目のカンマの位置を検索
+    if (comma_index1 != -1)
+    {
+        msgstr[0] = received_data.substring(0, comma_index1);                            // 1番目の部分文字列を取得
+        int comma_index2 = received_data.indexOf(',', comma_index1 + 1);                  // 2番目のカンマの位置を検索
+        if (comma_index2 != -1)
+        {
+            msgstr[1] = received_data.substring(comma_index1 + 1);                      // 2番目の部分文字列を取得
+            int comma_index3 = received_data.indexOf(',', comma_index2 + 1); 
+            if(comma_index3 != -1)                                                       // 3番目のカンマの位置を検索
+            {
+              msgstr[2] = received_data.substring(0, comma_index2);                            // 1番目の部分文字列を取得
+              int comma_index4 = received_data.indexOf(',', comma_index3 + 1);     
+              if (comma_index4 != -1)
+              {
+                  msgstr[3] = received_data.substring(comma_index3 + 1, comma_index4);   // 3番目の部分文字列を取得
+                  msgstr[4] = received_data.substring(comma_index4 + 1);                 // 4番目の部分文字列を取得
+              }
+              else
+              {
+                  // カンマが3つ未満の場合のエラーハンドリング
+                  Serial.println("Error: Less than 2 commas in the inputString.");
+              }
+        }
+        else
+        {
+            // カンマが2つ未満の場合のエラーハンドリング
+            Serial.println("Error: Less than 2 commas in the inputString.");
+        }
+    }
+    else
+    {
+        // カンマが見つからない場合のエラーハンドリング
+        Serial.println("Error: No comma found in the inputString.");
+    }
 
-      msg[0] = msf[0].toInt();
-      msg[1] = msf[1].toInt();
-      msg[2] = msf[2].toInt();
-      msg[3] = msf[3].toInt();
-      msg[4] = msf[4].toInt();  // 文字列を浮動小数点数に変換
+    msg[0] = msgstr[0].toInt();
+    msg[1] = msgstr[1].toInt();
+    msg[2] = msgstr[2].toInt();
+    msg[3] = msgstr[3].toInt();
+    msg[4] = msgstr[4].toInt();
+
+
+      // 文字列を浮動小数点数に変換
 
       // データをシリアルモニターに表示
-    }
+    
   }
-}              
+}         
+}     
 
 //int なので整数値で設定
 
@@ -54,7 +88,8 @@ int relay = 10;
 
 
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   pinMode(MOT1, OUTPUT);
   pinMode(DIR1, OUTPUT);
@@ -66,7 +101,8 @@ void setup() {
 }
 
 
-void loop() {
+void loop() 
+{
   receive_serial();
 
   Serial.println(msg[0]);
@@ -108,7 +144,6 @@ void loop() {
     analogWrite(MOT3, 75);
     digitalWrite(DIR3, HIGH);
   }
-
   else if (msg[3] < -5) {
     analogWrite(MOT3, 75);
     digitalWrite(DIR3, LOW);
@@ -125,4 +160,5 @@ void loop() {
     analogWrite(MOT2, 0);
     analogWrite(MOT3, 0);
   }
+
 }
