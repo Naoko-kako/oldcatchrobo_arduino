@@ -25,7 +25,10 @@ void receive_serial() {
     String msgstr[5];   // 改行までのデータを読み込む
     Serial.println(received_data);                          // データをシリアルモニターに表示
 
-    int comma_index1 = received_data.indexOf(',');                                        // 1番目のカンマの位置を検索
+    int comma_index1 = received_data.indexOf(',');                      
+    
+    
+                      // 1番目のカンマの位置を検索
     if (comma_index1 != -1)
     {
         msgstr[0] = received_data.substring(0, comma_index1);                            // 1番目の部分文字列を取得
@@ -49,6 +52,7 @@ void receive_serial() {
                   Serial.println("Error: Less than 2 commas in the inputString.");
               }
         }
+             
         else
         {
             // カンマが2つ未満の場合のエラーハンドリング
@@ -105,16 +109,16 @@ void loop()
 {
   receive_serial();
 
-  Serial.println(msg[0]);
   Serial.print(" msg[0]: ");
-  Serial.print(msg[1]);
+  Serial.println(msg[0]);
   Serial.print(" msg[1]: ");
-  Serial.print(msg[2]);
+  Serial.print(msg[1]);
   Serial.print(" msg[2]: ");
-  Serial.print(msg[3]);
+  Serial.print(msg[2]);
   Serial.print(" msg[3]: ");
-  Serial.println(msg[4]);
+  Serial.print(msg[3]);
   Serial.print(" msg[4]: ");
+  Serial.print(msg[4]);
 
 
 
@@ -122,35 +126,36 @@ void loop()
 
 
   if (msg[1] > 5) {
-    analogWrite(MOT1, 75);
+    analogWrite(MOT1, 40);
     digitalWrite(DIR1, HIGH);
   } 
   else if (msg[1] < -5) {
-    analogWrite(MOT1, 75);
+    analogWrite(MOT1, 40);
     digitalWrite(DIR1, LOW);
   }
 
-  else if (msg[2] > 5) {
+  else if (msg[3]==0&&msg[2] > 5) {
     analogWrite(MOT2, 75);
     digitalWrite(DIR2, HIGH);
   }
 
-  else if (msg[2] < -5) {
+  else if (msg[3]==0&&msg[2] < -5) {
     analogWrite(MOT2, 75);
     digitalWrite(DIR2, LOW);
   }
 
   else if (msg[3] > 5) {
-    analogWrite(MOT3, 75);
+    analogWrite(MOT3, 30);
     digitalWrite(DIR3, HIGH);
   }
   else if (msg[3] < -5) {
-    analogWrite(MOT3, 75);
+    analogWrite(MOT3, 30);
     digitalWrite(DIR3, LOW);
   }
   //R1R2
   else if (msg[4] > 5) {
     digitalWrite(relay, LOW);
+    
    } 
   else if (msg[4] < -5) {
     digitalWrite(relay, HIGH);
@@ -159,6 +164,7 @@ void loop()
     analogWrite(MOT1, 0);
     analogWrite(MOT2, 0);
     analogWrite(MOT3, 0);
+
   }
 
 }
